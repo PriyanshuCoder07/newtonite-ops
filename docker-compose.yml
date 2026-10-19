@@ -1,0 +1,21 @@
+# NOT used by the application today: the app targets SQLite (see README "Known limitations").
+# This only starts an empty PostgreSQL 16 container, kept as a starting point for a Postgres migration.
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: newtonite
+      POSTGRES_PASSWORD: newtonite
+      POSTGRES_DB: newtonite_ops
+    ports:
+      - "5432:5432"
+    volumes:
+      - newtonite_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U newtonite -d newtonite_ops"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  newtonite_pg:
