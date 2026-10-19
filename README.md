@@ -22,7 +22,7 @@ Built for the **Newtonite Software Engineering Challenge: "Operations Under Pres
 
 ---
 
-## Why this exists
+## 🎯 Why this exists
 
 Operational work at a growing company lives in chat threads, spreadsheets and email. Requests get lost,
 two people fix the same thing, someone edits a request that someone else just changed, and nobody can
@@ -30,9 +30,9 @@ say who decided what or why. Newtonite Ops replaces that with one workspace wher
 owner, a status, a priority and a history, and where **concurrent use is handled deliberately** instead
 of hoping users behave.
 
-## Highlights
+## ✨ Highlights
 
-| | |
+| Capability | How it works |
 |---|---|
 | **Stale-write protection** | Every item carries a `version`. Edits are one atomic `UPDATE ... WHERE id AND version`; a stale client gets **409** with the current version, never a silent overwrite. |
 | **Race-safe assignment and approvals** | Of N simultaneous requests exactly one wins and the rest get 409. Tested with real parallel requests. |
@@ -42,7 +42,7 @@ of hoping users behave.
 | **Duplicate-operation handling** | Repeated approval decisions return 409, no-op edits don't bump versions or log events, and creates accept an `Idempotency-Key`. |
 | **Built to stay fast** | Server-side search, filters, sorting and pagination; permission-scoped queries; database indexes on the filtered columns. |
 
-## Features
+## 🧩 Features
 
 - **Work items**: create, view, edit, assign and reassign, resolve, close and reopen, with readable references (`OPS-1001`).
 - **Six work types** (customer issue, engineering problem, payment investigation, production incident, compliance request, operational task), **seven statuses**, **four priorities**.
@@ -53,7 +53,7 @@ of hoping users behave.
 - **Notifications**: in-app, created transactionally (assigned, reassigned, approval requested, approval decided, critical item blocked).
 - **Auth**: cookie sessions with hashed tokens, bcrypt passwords, login rate limiting.
 
-## Tech stack
+## 🛠 Tech stack
 
 | Layer | Technology |
 |---|---|
@@ -67,12 +67,14 @@ of hoping users behave.
 
 ```mermaid
 flowchart LR
-    B["React SPA<br/>(TanStack Query)"] -->|"REST + session cookie"| R["Express routes<br/>auth, zod validation"]
-    R --> S["Services<br/>permissions, workflow, transactions"]
-    S --> D["domain/<br/>permissions.ts, workflow.ts"]
-    S -->|"one DB transaction"| P[("Prisma + SQLite")]
-    P --- T["WorkItem change<br/>+ ActivityEvent<br/>+ Notification"]
+    A["React SPA"] -->|"REST + cookie"| B["Express routes"]
+    B --> C["Services"]
+    C --> D["Domain rules"]
+    C -->|"one transaction"| E[("SQLite via Prisma")]
 ```
+
+The **domain rules** are pure functions in `permissions.ts` and `workflow.ts`. The **one transaction** holds
+the item change, its audit event and any notification.
 
 Every mutation follows the same path: authenticate, validate, load the resource through a team-scoped
 check, apply the workflow rule, then run **one transaction** containing the conditional update, the
@@ -279,7 +281,7 @@ Honest list of what this is **not**:
 - Workflow rules live in code, not configuration.
 - **Not done:** load testing, Playwright end-to-end tests, and automated UI tests beyond the work-item detail page.
 
-## Verification status
+## ✅ Verification status
 
 - **Automated:** all 46 tests pass locally and in CI on a clean Linux install.
 - **Not automated:** the UI beyond the work-item detail page is exercised manually only. No load testing has been performed.
